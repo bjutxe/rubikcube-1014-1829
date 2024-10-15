@@ -40,36 +40,57 @@ const rubiksCube = new THREE.Group();
 
 const colorMap = [
   'black',  // 内側
-  'white',  // 上面
-  'yellow', // 下面
-  'red',    // 前面
-  'orange', // 後面
-  'blue',   // 右面
-  'green'   // 左面
+  'green',  // 後面
+  'yellow', // 左面
+  'red',    // 上面
+  'white',  // 右面
+  'blue',   // 前面
+  'orange'  // 下面
 ];
 
-for (let x = -1; x <= 1; x++) {
-  for (let y = -1; y <= 1; y++) {
-    for (let z = -1; z <= 1; z++) {
-      const geometry = new THREE.BoxGeometry(cubeSize * 0.95, cubeSize * 0.95, cubeSize * 0.95);
-      const materials = [
-        new THREE.MeshBasicMaterial({ color: y === 1 ? colorMap[1] : colorMap[0] }),
-        new THREE.MeshBasicMaterial({ color: y === -1 ? colorMap[2] : colorMap[0] }),
-        new THREE.MeshBasicMaterial({ color: z === 1 ? colorMap[3] : colorMap[0] }),
-        new THREE.MeshBasicMaterial({ color: z === -1 ? colorMap[4] : colorMap[0] }),
-        new THREE.MeshBasicMaterial({ color: x === 1 ? colorMap[5] : colorMap[0] }),
-        new THREE.MeshBasicMaterial({ color: x === -1 ? colorMap[6] : colorMap[0] })
-      ];
-      const cube = new THREE.Mesh(geometry, materials);
-      cube.position.set(
-        x * (cubeSize + gap),
-        y * (cubeSize + gap),
-        z * (cubeSize + gap)
-      );
-      rubiksCube.add(cube);
-    }
-  }
-}
+let initParts = [
+            [
+              [0, 2, 3, 1, 0, 0], [0, 0, 3, 1, 0, 0], [4, 0, 3, 1, 0, 0],
+              [0, 2, 3, 0, 0, 0], [0, 0, 3, 0, 0, 0], [4, 0, 3, 0, 0, 0],
+              [0, 2, 3, 0, 5, 0], [0, 0, 3, 0, 5, 0], [4, 0, 3, 0, 5, 0]
+            ],
+            [
+              [0, 2, 0, 1, 0, 0], [0, 0, 0, 1, 0, 0], [4, 0, 0, 1, 0, 0],
+              [0, 2, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [4, 0, 0, 0, 0, 0],
+              [0, 2, 0, 0, 5, 0], [0, 0, 0, 0, 5, 0], [4, 0, 0, 0, 5, 0]
+            ],
+            [
+              [0, 2, 0, 1, 0, 6], [0, 0, 0, 1, 0, 6], [4, 0, 0, 1, 0, 6],
+              [0, 2, 0, 0, 0, 6], [0, 0, 0, 0, 0, 6], [4, 0, 0, 0, 0, 6],
+              [0, 2, 0, 0, 5, 6], [0, 0, 0, 0, 5, 6], [4, 0, 0, 0, 5, 6]
+            ],
+          ];
+
+// ルービックキューブの初期化
+initParts.forEach((layer, yIndex) => {
+  layer.forEach((cubeDef, xzIndex) => {
+    const x = (xzIndex % 3) - 1;
+    const z = Math.floor(xzIndex / 3) - 1;
+    const y = 1 - yIndex;
+
+    const geometry = new THREE.BoxGeometry(cubeSize * 0.95, cubeSize * 0.95, cubeSize * 0.95);
+    const materials = [
+      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[0]] }), // 上面
+      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[1]] }), // 下面
+      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[2]] }), // 前面
+      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[3]] }), // 後面
+      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[4]] }), // 右面
+      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[5]] })  // 左面
+    ];
+    const cube = new THREE.Mesh(geometry, materials);
+    cube.position.set(
+      x * (cubeSize + gap),
+      y * (cubeSize + gap),
+      z * (cubeSize + gap)
+    );
+    rubiksCube.add(cube);
+  });
+});
 
 rubiksCube.position.set(0, 1, 0);
 camera.lookAt(rubiksCube.position);
