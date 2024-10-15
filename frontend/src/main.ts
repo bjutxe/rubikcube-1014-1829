@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import TWEEN from '@tweenjs/tween.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // シーンの作成
 const scene = new THREE.Scene();
@@ -17,6 +18,15 @@ camera.position.set(4, 4, 4);
 
 // レンダラーの作成
 const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x87ceeb, 1);
+document.body.appendChild(renderer.domElement);
+
+// オービットコントロールの追加
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.25;
+controls.enableZoom = true;
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0x87ceeb, 1);
 document.body.appendChild(renderer.domElement);
@@ -100,6 +110,7 @@ scene.add(rubiksCube);
 
 // アニメーションループ
 const animate = () => {
+  controls.update();
   requestAnimationFrame(animate);
   TWEEN.update();
   renderer.render(scene, camera);
