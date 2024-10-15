@@ -12,6 +12,7 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 camera.position.set(8, 8, 8);
+// camera.position.set(-8, -8, -8); // 真反対からのカメラ
 
 // レンダラーの作成
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -50,19 +51,19 @@ const colorMap = [
 
 let initParts = [
             [
-              [0, 2, 3, 1, 0, 0], [0, 0, 3, 1, 0, 0], [4, 0, 3, 1, 0, 0],
+              [0, 2, 3, 0, 0, 1], [0, 0, 3, 0, 0, 1], [4, 0, 3, 0, 0, 1],
               [0, 2, 3, 0, 0, 0], [0, 0, 3, 0, 0, 0], [4, 0, 3, 0, 0, 0],
               [0, 2, 3, 0, 5, 0], [0, 0, 3, 0, 5, 0], [4, 0, 3, 0, 5, 0]
             ],
             [
-              [0, 2, 0, 1, 0, 0], [0, 0, 0, 1, 0, 0], [4, 0, 0, 1, 0, 0],
+              [0, 2, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1], [4, 0, 0, 0, 0, 1],
               [0, 2, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [4, 0, 0, 0, 0, 0],
               [0, 2, 0, 0, 5, 0], [0, 0, 0, 0, 5, 0], [4, 0, 0, 0, 5, 0]
             ],
             [
-              [0, 2, 0, 1, 0, 6], [0, 0, 0, 1, 0, 6], [4, 0, 0, 1, 0, 6],
-              [0, 2, 0, 0, 0, 6], [0, 0, 0, 0, 0, 6], [4, 0, 0, 0, 0, 6],
-              [0, 2, 0, 0, 5, 6], [0, 0, 0, 0, 5, 6], [4, 0, 0, 0, 5, 6]
+              [0, 2, 0, 6, 0, 1], [0, 0, 0, 6, 0, 1], [4, 0, 0, 6, 0, 1],
+              [0, 2, 0, 6, 0, 0], [0, 0, 0, 6, 0, 0], [4, 0, 0, 6, 0, 0],
+              [0, 2, 0, 6, 5, 0], [0, 0, 0, 6, 5, 0], [4, 0, 0, 6, 5, 0]
             ],
           ];
 
@@ -75,12 +76,12 @@ initParts.forEach((layer, yIndex) => {
 
     const geometry = new THREE.BoxGeometry(cubeSize * 0.95, cubeSize * 0.95, cubeSize * 0.95);
     const materials = [
-      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[0]] }), // 上面
-      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[1]] }), // 下面
-      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[2]] }), // 前面
-      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[3]] }), // 後面
-      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[4]] }), // 右面
-      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[5]] })  // 左面
+      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[0]] }), // 右面
+      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[1]] }), // 左面
+      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[2]] }), // 上面
+      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[3]] }), // 下面
+      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[4]] }), // 前面
+      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[5]] })  // 後面
     ];
     const cube = new THREE.Mesh(geometry, materials);
     cube.position.set(
