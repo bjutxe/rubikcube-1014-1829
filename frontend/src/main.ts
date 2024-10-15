@@ -35,20 +35,30 @@ scene.add(light);
 
 // ルービックキューブの作成
 const cubeSize = 1;
-const gap = 0.05;
+const gap = 0.15;
 const rubiksCube = new THREE.Group();
+
+const colorMap = [
+  'black',  // 内側
+  'white',  // 上面
+  'yellow', // 下面
+  'red',    // 前面
+  'orange', // 後面
+  'blue',   // 右面
+  'green'   // 左面
+];
 
 for (let x = -1; x <= 1; x++) {
   for (let y = -1; y <= 1; y++) {
     for (let z = -1; z <= 1; z++) {
-      const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+      const geometry = new THREE.BoxGeometry(cubeSize * 0.95, cubeSize * 0.95, cubeSize * 0.95);
       const materials = [
-        new THREE.MeshBasicMaterial({ color: z === 1 ? 'red' : 'black' }),
-        new THREE.MeshBasicMaterial({ color: z === -1 ? 'orange' : 'black' }),
-        new THREE.MeshBasicMaterial({ color: y === 1 ? 'white' : 'black' }),
-        new THREE.MeshBasicMaterial({ color: y === -1 ? 'yellow' : 'black' }),
-        new THREE.MeshBasicMaterial({ color: x === 1 ? 'blue' : 'black' }),
-        new THREE.MeshBasicMaterial({ color: x === -1 ? 'green' : 'black' })
+        new THREE.MeshBasicMaterial({ color: y === 1 ? colorMap[1] : colorMap[0] }),
+        new THREE.MeshBasicMaterial({ color: y === -1 ? colorMap[2] : colorMap[0] }),
+        new THREE.MeshBasicMaterial({ color: z === 1 ? colorMap[3] : colorMap[0] }),
+        new THREE.MeshBasicMaterial({ color: z === -1 ? colorMap[4] : colorMap[0] }),
+        new THREE.MeshBasicMaterial({ color: x === 1 ? colorMap[5] : colorMap[0] }),
+        new THREE.MeshBasicMaterial({ color: x === -1 ? colorMap[6] : colorMap[0] })
       ];
       const cube = new THREE.Mesh(geometry, materials);
       cube.position.set(
