@@ -112,7 +112,7 @@ const handleKeyPress = (event: KeyboardEvent) => {
   const key = event.key.toUpperCase();
   switch (key) {
     case 'U':
-      rotateLayer('y', 1, Math.PI / 2);
+      rotateLayer('y', 1, -Math.PI / 2);
       break;
     case 'D':
       rotateLayer('y', -1, Math.PI / 2);
@@ -121,10 +121,10 @@ const handleKeyPress = (event: KeyboardEvent) => {
       rotateLayer('x', -1, Math.PI / 2);
       break;
     case 'R':
-      rotateLayer('x', 1, Math.PI / 2);
+      rotateLayer('x', 1, -Math.PI / 2);
       break;
     case 'F':
-      rotateLayer('z', 1, Math.PI / 2);
+      rotateLayer('z', 1, -Math.PI / 2);
       break;
     case 'B':
       rotateLayer('z', -1, Math.PI / 2);
