@@ -11,13 +11,14 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.set(8, 8, 8);
-// camera.position.set(-8, -8, -8); // 真反対からのカメラ
+// R, U, F
+camera.position.set(4, 4, 4);
+// camera.position.set(-4, -4, -4); // 真反対からのカメラ
 
 // レンダラーの作成
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0xffffff, 1);
+renderer.setClearColor(0x87ceeb, 1);
 document.body.appendChild(renderer.domElement);
 
 // リサイズ対応
