@@ -174,12 +174,6 @@ const rotateLayer = (axis: 'x' | 'y' | 'z', direction: number, angle: number) =>
 
   rubiksCube.add(layer);
 
-  const rotationAxis = new THREE.Vector3(
-    axis === 'x' ? 1 : 0,
-    axis === 'y' ? 1 : 0,
-    axis === 'z' ? 1 : 0
-  );
-
   new TWEEN.Tween({ rotation: 0 })
     .to({ rotation: angle }, 500)
     .easing(TWEEN.Easing.Quadratic.Out)
