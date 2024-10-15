@@ -11,7 +11,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.z = 10;
+camera.position.set(8, 8, 8);
 
 // レンダラーの作成
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -43,12 +43,12 @@ for (let x = -1; x <= 1; x++) {
     for (let z = -1; z <= 1; z++) {
       const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
       const materials = [
-        new THREE.MeshBasicMaterial({ color: z === 1 ? 'red' : 'black' }),    // 前
-        new THREE.MeshBasicMaterial({ color: z === -1 ? 'orange' : 'black' }), // 後
-        new THREE.MeshBasicMaterial({ color: y === 1 ? 'white' : 'black' }),   // 上
-        new THREE.MeshBasicMaterial({ color: y === -1 ? 'yellow' : 'black' }), // 下
-        new THREE.MeshBasicMaterial({ color: x === 1 ? 'blue' : 'black' }),    // 右
-        new THREE.MeshBasicMaterial({ color: x === -1 ? 'green' : 'black' })   // 左
+        new THREE.MeshBasicMaterial({ color: z === 1 ? 'red' : 'black' }),
+        new THREE.MeshBasicMaterial({ color: z === -1 ? 'orange' : 'black' }),
+        new THREE.MeshBasicMaterial({ color: y === 1 ? 'white' : 'black' }),
+        new THREE.MeshBasicMaterial({ color: y === -1 ? 'yellow' : 'black' }),
+        new THREE.MeshBasicMaterial({ color: x === 1 ? 'blue' : 'black' }),
+        new THREE.MeshBasicMaterial({ color: x === -1 ? 'green' : 'black' })
       ];
       const cube = new THREE.Mesh(geometry, materials);
       cube.position.set(
@@ -61,6 +61,8 @@ for (let x = -1; x <= 1; x++) {
   }
 }
 
+rubiksCube.position.set(0, 1, 0);
+camera.lookAt(rubiksCube.position);
 scene.add(rubiksCube);
 
 // アニメーションループ
