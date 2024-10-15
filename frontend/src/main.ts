@@ -148,19 +148,28 @@ const handleKeyPress = (event: KeyboardEvent) => {
 const rotateLayer = (axis: 'x' | 'y' | 'z', direction: number, angle: number) => {
   const layer = new THREE.Group();
 
+  // 一時的に移動するためのリストを用意
+  const cubesToMove: THREE.Object3D[] = [];
+
   rubiksCube.children.forEach((cube: THREE.Object3D) => {
     const pos = cube.position;
     switch (axis) {
       case 'x':
-        if (Math.round(pos.x) === direction) layer.add(cube);
+        if (Math.round(pos.x) === direction) cubesToMove.push(cube);
         break;
       case 'y':
-        if (Math.round(pos.y) === direction) layer.add(cube);
+        if (Math.round(pos.y) === direction) cubesToMove.push(cube);
         break;
       case 'z':
-        if (Math.round(pos.z) === direction) layer.add(cube);
+        if (Math.round(pos.z) === direction) cubesToMove.push(cube);
         break;
     }
+  });
+
+  // 回転させるキューブをレイヤーに追加
+  cubesToMove.forEach(cube => {
+    rubiksCube.remove(cube);
+    layer.add(cube);
   });
 
   rubiksCube.add(layer);
@@ -181,7 +190,6 @@ const rotateLayer = (axis: 'x' | 'y' | 'z', direction: number, angle: number) =>
       layer.children.forEach((cube: THREE.Object3D) => {
         rubiksCube.attach(cube);
       });
-      rubiksCube.remove(layer);
     })
     .start();
 };
