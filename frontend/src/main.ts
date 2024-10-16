@@ -122,7 +122,10 @@ const handleKeyPress = (event: KeyboardEvent) => {
     'L': ['x', -1, Math.PI / 2],
     'R': ['x', 1, -Math.PI / 2],
     'F': ['z', 1, -Math.PI / 2],
-    'B': ['z', -1, Math.PI / 2]
+    'B': ['z', -1, Math.PI / 2],
+    'M': ['x', 0, Math.PI / 2],
+    'E': ['y', 0, Math.PI / 2],
+    'S': ['z', 0, -Math.PI / 2]
   };
 
   if (key in keyMap) {
