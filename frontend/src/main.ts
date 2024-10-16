@@ -141,79 +141,55 @@ const handleKeyPress = (event: KeyboardEvent) => {
   }
 };
 
+const rotateGroup = (group: THREE.Group, axis: 'x' | 'y' | 'z', angle: number, onCompleteCallback: () => void) => {
+  new TWEEN.Tween({ rotation: 0 })
+    .to({ rotation: angle }, 500)
+    .easing(TWEEN.Easing.Quadratic.Out)
+    .onUpdate((obj: any) => {
+      group.rotation[axis] = obj.rotation;
+    })
+    .onComplete(onCompleteCallback)
+    .start();
+};
+
+const rotateLayerOrCube = (cubesToMove: THREE.Object3D[], axis: 'x' | 'y' | 'z', angle: number) => {
+  const group = new THREE.Group();
+  cubesToMove.forEach(cube => {
+    rubiksCube.remove(cube);
+    group.add(cube);
+  });
+  rubiksCube.add(group);
+
+  rotateGroup(group, axis, angle, () => {
+    while (group.children.length > 0) {
+      const cube = group.children[0];
+      cube.applyMatrix4(group.matrixWorld);
+      cube.position.set(
+        parseFloat(cube.position.x.toFixed(2)),
+        parseFloat(cube.position.y.toFixed(2)),
+        parseFloat(cube.position.z.toFixed(2))
+      );
+      rubiksCube.add(cube);
+    }
+    rubiksCube.remove(group);
+  });
+};
+
 const rotateLayer = (axis: 'x' | 'y' | 'z', direction: number, angle: number) => {
-  const layer = new THREE.Group();
-
-  // 一時的に移動するためのリストを用意
   const cubesToMove: THREE.Object3D[] = [];
-
   rubiksCube.children.forEach((cube: THREE.Object3D) => {
     const pos = cube.position;
     if (Math.round(pos[axis]) === direction) cubesToMove.push(cube);
   });
 
-  // 回転させるキューブをレイヤーに追加
-  cubesToMove.forEach(cube => {
-    rubiksCube.remove(cube);
-    layer.add(cube);
-  });
-
-  rubiksCube.add(layer);
-
-  new TWEEN.Tween({ rotation: 0 })
-    .to({ rotation: angle }, 500)
-    .easing(TWEEN.Easing.Quadratic.Out)
-    .onUpdate((obj: any) => {
-      layer.rotation[axis] = obj.rotation;
-    })
-    .onComplete(() => {
-      while (layer.children.length > 0) {
-        const cube = layer.children[0];
-        cube.applyMatrix4(layer.matrixWorld);
-        cube.position.set(
-          parseFloat(cube.position.x.toFixed(2)),
-          parseFloat(cube.position.y.toFixed(2)),
-          parseFloat(cube.position.z.toFixed(2))
-        );
-        rubiksCube.add(cube);
-      }
-      rubiksCube.remove(layer);
-    })
-    .start();
+  rotateLayerOrCube(cubesToMove, axis, angle);
 };
 
 const rotateCube = (axis: 'x' | 'y' | 'z', angle: number) => {
-  // すべてのパーツを別の変数にコピー
   const cubesToMove: THREE.Object3D[] = [];
   rubiksCube.children.forEach(cube => cubesToMove.push(cube));
 
-  const allCubes = new THREE.Group();
-  cubesToMove.forEach(cube => {
-    rubiksCube.remove(cube);
-    allCubes.add(cube);
-  });
-  rubiksCube.add(allCubes);
-
-  new TWEEN.Tween({ rotation: 0 })
-  .to({ rotation: angle }, 500)
-    .easing(TWEEN.Easing.Quadratic.Out)
-    .onUpdate((obj: any) => {
-      allCubes.rotation[axis] = obj.rotation;
-    })
-    .onComplete(() => {
-      while (allCubes.children.length > 0) {
-        const cube = allCubes.children[0];
-        cube.applyMatrix4(allCubes.matrixWorld);
-        cube.position.set(
-          parseFloat(cube.position.x.toFixed(2)),
-          parseFloat(cube.position.y.toFixed(2)),
-          parseFloat(cube.position.z.toFixed(2))
-        );
-        rubiksCube.add(cube);
-      }
-      rubiksCube.remove(allCubes);
-    })
-    .start();
+  rotateLayerOrCube(cubesToMove, axis, angle);
 };
 
 // キー入力イベントリスナーの追加
