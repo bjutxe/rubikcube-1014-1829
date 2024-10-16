@@ -12,9 +12,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-// R, U, F
 camera.position.set(4, 4, 4);
-// camera.position.set(-4, -4, -4); // 真反対からのカメラ
 
 // レンダラーの作成
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -27,9 +25,6 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.enableZoom = true;
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x87ceeb, 1);
-document.body.appendChild(renderer.domElement);
 
 // リサイズ対応
 window.addEventListener('resize', () => {
@@ -60,23 +55,23 @@ const colorMap = [
   'orange'  // 下面
 ];
 
-let initParts = [
-            [
-              [0, 2, 3, 0, 0, 1], [0, 0, 3, 0, 0, 1], [4, 0, 3, 0, 0, 1],
-              [0, 2, 3, 0, 0, 0], [0, 0, 3, 0, 0, 0], [4, 0, 3, 0, 0, 0],
-              [0, 2, 3, 0, 5, 0], [0, 0, 3, 0, 5, 0], [4, 0, 3, 0, 5, 0]
-            ],
-            [
-              [0, 2, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1], [4, 0, 0, 0, 0, 1],
-              [0, 2, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [4, 0, 0, 0, 0, 0],
-              [0, 2, 0, 0, 5, 0], [0, 0, 0, 0, 5, 0], [4, 0, 0, 0, 5, 0]
-            ],
-            [
-              [0, 2, 0, 6, 0, 1], [0, 0, 0, 6, 0, 1], [4, 0, 0, 6, 0, 1],
-              [0, 2, 0, 6, 0, 0], [0, 0, 0, 6, 0, 0], [4, 0, 0, 6, 0, 0],
-              [0, 2, 0, 6, 5, 0], [0, 0, 0, 6, 5, 0], [4, 0, 0, 6, 5, 0]
-            ],
-          ];
+const initParts = [
+  [
+    [0, 2, 3, 0, 0, 1], [0, 0, 3, 0, 0, 1], [4, 0, 3, 0, 0, 1],
+    [0, 2, 3, 0, 0, 0], [0, 0, 3, 0, 0, 0], [4, 0, 3, 0, 0, 0],
+    [0, 2, 3, 0, 5, 0], [0, 0, 3, 0, 5, 0], [4, 0, 3, 0, 5, 0]
+  ],
+  [
+    [0, 2, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1], [4, 0, 0, 0, 0, 1],
+    [0, 2, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [4, 0, 0, 0, 0, 0],
+    [0, 2, 0, 0, 5, 0], [0, 0, 0, 0, 5, 0], [4, 0, 0, 0, 5, 0]
+  ],
+  [
+    [0, 2, 0, 6, 0, 1], [0, 0, 0, 6, 0, 1], [4, 0, 0, 6, 0, 1],
+    [0, 2, 0, 6, 0, 0], [0, 0, 0, 6, 0, 0], [4, 0, 0, 6, 0, 0],
+    [0, 2, 0, 6, 5, 0], [0, 0, 0, 6, 5, 0], [4, 0, 0, 6, 5, 0]
+  ],
+];
 
 // ルービックキューブの初期化
 initParts.forEach((layer, yIndex) => {
@@ -153,17 +148,7 @@ const rotateLayer = (axis: 'x' | 'y' | 'z', direction: number, angle: number) =>
 
   rubiksCube.children.forEach((cube: THREE.Object3D) => {
     const pos = cube.position;
-    switch (axis) {
-      case 'x':
-        if (Math.round(pos.x) === direction) cubesToMove.push(cube);
-        break;
-      case 'y':
-        if (Math.round(pos.y) === direction) cubesToMove.push(cube);
-        break;
-      case 'z':
-        if (Math.round(pos.z) === direction) cubesToMove.push(cube);
-        break;
-    }
+    if (Math.round(pos[axis]) === direction) cubesToMove.push(cube);
   });
 
   // 回転させるキューブをレイヤーに追加
