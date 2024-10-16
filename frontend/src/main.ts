@@ -116,27 +116,18 @@ animate();
 // キーボード入力による回転
 const handleKeyPress = (event: KeyboardEvent) => {
   const key = event.key.toUpperCase();
-  switch (key) {
-    case 'U':
-      rotateLayer('y', 1, -Math.PI / 2);
-      break;
-    case 'D':
-      rotateLayer('y', -1, Math.PI / 2);
-      break;
-    case 'L':
-      rotateLayer('x', -1, Math.PI / 2);
-      break;
-    case 'R':
-      rotateLayer('x', 1, -Math.PI / 2);
-      break;
-    case 'F':
-      rotateLayer('z', 1, -Math.PI / 2);
-      break;
-    case 'B':
-      rotateLayer('z', -1, Math.PI / 2);
-      break;
-    default:
-      break;
+  const keyMap: Record<string, [string, number, number]> = {
+    'U': ['y', 1, -Math.PI / 2],
+    'D': ['y', -1, Math.PI / 2],
+    'L': ['x', -1, Math.PI / 2],
+    'R': ['x', 1, -Math.PI / 2],
+    'F': ['z', 1, -Math.PI / 2],
+    'B': ['z', -1, Math.PI / 2]
+  };
+
+  if (key in keyMap) {
+    const [axis, direction, angle] = keyMap[key];
+    rotateLayer(axis as 'x' | 'y' | 'z', direction, angle);
   }
 };
 
