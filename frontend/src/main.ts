@@ -146,16 +146,12 @@ const handleKeyPress = (event: KeyboardEvent) => {
 };
 
 const rotateLayer = (axis: 'x' | 'y' | 'z', direction: number, angle: number) => {
-  console.log('Starting rotation:', { axis, direction, angle });
   const layer = new THREE.Group();
-  console.log('Initial layer children count:', layer.children.length);
 
   // 一時的に移動するためのリストを用意
   const cubesToMove: THREE.Object3D[] = [];
-  console.log('Initial rubiksCube children count:', rubiksCube.children.length);
 
   rubiksCube.children.forEach((cube: THREE.Object3D) => {
-    console.log('Checking cube position:', cube.position);
     const pos = cube.position;
     switch (axis) {
       case 'x':
@@ -171,9 +167,7 @@ const rotateLayer = (axis: 'x' | 'y' | 'z', direction: number, angle: number) =>
   });
 
   // 回転させるキューブをレイヤーに追加
-  console.log('cubesToMove count:', cubesToMove.length);
   cubesToMove.forEach(cube => {
-    console.log('Adding cube to layer:', cube.position);
     rubiksCube.remove(cube);
     layer.add(cube);
   });
@@ -187,12 +181,14 @@ const rotateLayer = (axis: 'x' | 'y' | 'z', direction: number, angle: number) =>
       layer.rotation[axis] = obj.rotation;
     })
     .onComplete(() => {
-      console.log('Final layer children count before attaching back:', layer.children.length);
-      layer.children.forEach((cube: THREE.Object3D) => {
-        console.log('Attaching cube back to rubiksCube:', cube.position);
+      while (layer.children.length > 0) {
+        const cube = layer.children[0];
+        console.log(cube.position);
+        cube.applyMatrix4(layer.matrixWorld);
+        console.log(cube.position);
         rubiksCube.add(cube);
-      });
-      console.log('rubiksCube children count:', rubiksCube.children.length);
+      }
+      rubiksCube.remove(layer);
     })
     .start();
 };
