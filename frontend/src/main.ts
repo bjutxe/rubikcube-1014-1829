@@ -125,12 +125,19 @@ const handleKeyPress = (event: KeyboardEvent) => {
     'B': ['z', -1, Math.PI / 2],
     'M': ['x', 0, Math.PI / 2],
     'E': ['y', 0, Math.PI / 2],
-    'S': ['z', 0, -Math.PI / 2]
+    'S': ['z', 0, -Math.PI / 2],
+    'X': ['x', 1, -Math.PI / 2],
+    'Y': ['y', 1, -Math.PI / 2],
+    'Z': ['z', 1, -Math.PI / 2]
   };
 
   if (key in keyMap) {
     const [axis, direction, angle] = keyMap[key];
-    rotateLayer(axis as 'x' | 'y' | 'z', direction, angle);
+    if (['X', 'Y', 'Z'].includes(key)) {
+      rotateCube(axis as 'x' | 'y' | 'z', angle);
+    } else {
+      rotateLayer(axis as 'x' | 'y' | 'z', direction, angle);
+    }
   }
 };
 
@@ -171,6 +178,40 @@ const rotateLayer = (axis: 'x' | 'y' | 'z', direction: number, angle: number) =>
         rubiksCube.add(cube);
       }
       rubiksCube.remove(layer);
+    })
+    .start();
+};
+
+const rotateCube = (axis: 'x' | 'y' | 'z', angle: number) => {
+  // すべてのパーツを別の変数にコピー
+  const cubesToMove: THREE.Object3D[] = [];
+  rubiksCube.children.forEach(cube => cubesToMove.push(cube));
+
+  const allCubes = new THREE.Group();
+  cubesToMove.forEach(cube => {
+    rubiksCube.remove(cube);
+    allCubes.add(cube);
+  });
+  rubiksCube.add(allCubes);
+
+  new TWEEN.Tween({ rotation: 0 })
+  .to({ rotation: angle }, 500)
+    .easing(TWEEN.Easing.Quadratic.Out)
+    .onUpdate((obj: any) => {
+      allCubes.rotation[axis] = obj.rotation;
+    })
+    .onComplete(() => {
+      while (allCubes.children.length > 0) {
+        const cube = allCubes.children[0];
+        cube.applyMatrix4(allCubes.matrixWorld);
+        cube.position.set(
+          parseFloat(cube.position.x.toFixed(2)),
+          parseFloat(cube.position.y.toFixed(2)),
+          parseFloat(cube.position.z.toFixed(2))
+        );
+        rubiksCube.add(cube);
+      }
+      rubiksCube.remove(allCubes);
     })
     .start();
 };
