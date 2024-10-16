@@ -115,7 +115,10 @@ animate();
 
 // キーボード入力による回転
 const handleKeyPress = (event: KeyboardEvent) => {
+  event.preventDefault(); // キーボードのデフォルト動作を無効化
   const key = event.key.toUpperCase();
+  const isAlt = event.altKey;      // 逆回転を示す
+  const isShift = event.shiftKey;  // 2層回転を示す
   const keyMap: Record<string, [string, number, number]> = {
     'U': ['y', 1, -Math.PI / 2],
     'D': ['y', -1, Math.PI / 2],
@@ -126,13 +129,27 @@ const handleKeyPress = (event: KeyboardEvent) => {
     'M': ['x', 0, Math.PI / 2],
     'E': ['y', 0, Math.PI / 2],
     'S': ['z', 0, -Math.PI / 2],
-    'X': ['x', 1, -Math.PI / 2],
-    'Y': ['y', 1, -Math.PI / 2],
-    'Z': ['z', 1, -Math.PI / 2]
+    'X': ['x', 0, -Math.PI / 2],
+    'Y': ['y', 0, -Math.PI / 2],
+    'Z': ['z', 0, -Math.PI / 2]
   };
 
   if (key in keyMap) {
-    const [axis, direction, angle] = keyMap[key];
+    let [axis, direction, angle] = keyMap[key];
+
+    // 逆回転
+    if (isAlt) {
+      angle = -angle;
+    }
+
+    // 2層回転
+    if (isShift) {
+      if (direction !== 0) {
+        rotateLayer(axis as 'x' | 'y' | 'z', 0, angle); // 中央層も回転
+      }
+    }
+
+    // 通常のレイヤーまたは全体の回転
     if (['X', 'Y', 'Z'].includes(key)) {
       rotateCube(axis as 'x' | 'y' | 'z', angle);
     } else {
