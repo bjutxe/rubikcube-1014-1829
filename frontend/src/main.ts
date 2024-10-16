@@ -104,7 +104,7 @@ initParts.forEach((layer, yIndex) => {
   });
 });
 
-rubiksCube.position.set(0, 1, 0);
+rubiksCube.position.set(0, 0, 0);
 camera.lookAt(rubiksCube.position);
 scene.add(rubiksCube);
 
@@ -183,9 +183,12 @@ const rotateLayer = (axis: 'x' | 'y' | 'z', direction: number, angle: number) =>
     .onComplete(() => {
       while (layer.children.length > 0) {
         const cube = layer.children[0];
-        console.log(cube.position);
         cube.applyMatrix4(layer.matrixWorld);
-        console.log(cube.position);
+        cube.position.set(
+          parseFloat(cube.position.x.toFixed(2)),
+          parseFloat(cube.position.y.toFixed(2)),
+          parseFloat(cube.position.z.toFixed(2))
+        );
         rubiksCube.add(cube);
       }
       rubiksCube.remove(layer);
