@@ -6,36 +6,49 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 const scene = new THREE.Scene();
 
 // カメラの設定
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-camera.position.set(4, 4, 4);
+const createCamera = () => {
+  const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+  camera.position.set(4, 4, 4);
+  return camera;
+};
+const camera = createCamera();
 
 // レンダラーの作成
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x87ceeb, 1);
-document.body.appendChild(renderer.domElement);
+const createRenderer = () => {
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x87ceeb, 1);
+  document.body.appendChild(renderer.domElement);
+  return renderer;
+};
+const renderer = createRenderer();
 
 // オービットコントロールの追加
-const controls = new OrbitControls(camera, renderer.domElement);
-Object.assign(controls, {
-  enableDamping: true,
-  dampingFactor: 0.25,
-  enableZoom: true
-});
+const createControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
+  const controls = new OrbitControls(camera, renderer.domElement);
+  Object.assign(controls, {
+    enableDamping: true,
+    dampingFactor: 0.25,
+    enableZoom: true
+  });
+  return controls;
+};
+const controls = createControls(camera, renderer);
 
 // リサイズ対応
-window.addEventListener('resize', () => {
+const onWindowResize = () => {
   const width = window.innerWidth;
   const height = window.innerHeight;
   renderer.setSize(width, height);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
-});
+};
+window.addEventListener('resize', onWindowResize);
 
 // 照明の追加
 const addLighting = (scene: THREE.Scene) => {
@@ -166,6 +179,8 @@ const handleKeyPress = (event: KeyboardEvent) => {
   }
 };
 
+document.addEventListener('keydown', handleKeyPress);
+
 const handleRotation = (
   key: string,
   isAlt: boolean,
@@ -254,6 +269,3 @@ const rotateCube = (axis: 'x' | 'y' | 'z', angle: number) => {
   const cubesToMove = rubiksCube.children.slice();
   rotateLayerOrCube(cubesToMove, axis, angle);
 };
-
-// キー入力イベントリスナーの追加
-document.addEventListener('keydown', handleKeyPress);
