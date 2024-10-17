@@ -38,9 +38,12 @@ window.addEventListener('resize', () => {
 });
 
 // 照明の追加
-const light = new THREE.PointLight(0xffffff, 1);
-light.position.set(10, 10, 10);
-scene.add(light);
+const addLighting = (scene: THREE.Scene) => {
+  const light = new THREE.PointLight(0xffffff, 1);
+  light.position.set(10, 10, 10);
+  scene.add(light);
+};
+addLighting(scene);
 
 // ルービックキューブの作成
 const cubeSize = 1;
@@ -75,9 +78,15 @@ const initParts: number[][][] = [
   ],
 ];
 
+const createCubeMaterials = (cubeDef: number[]) => {
+  return cubeDef.map(colorIndex => (
+    new THREE.MeshBasicMaterial({ color: colorMap[colorIndex] })
+  ));
+};
+
 // ルービックキューブの初期化
-const initializeRubiksCube = (initParts: number[][][]) => {
-  initParts.forEach((layer, yIndex) => {
+const initializeRubiksCube = (cubeConfiguration: number[][][]) => {
+  cubeConfiguration.forEach((layer, yIndex) => {
     layer.forEach((cubeDef, xzIndex) => {
       const x = (xzIndex % 3) - 1;
       const z = Math.floor(xzIndex / 3) - 1;
@@ -88,9 +97,7 @@ const initializeRubiksCube = (initParts: number[][][]) => {
         cubeSize * 0.95,
         cubeSize * 0.95
       );
-      const materials = cubeDef.map(colorIndex => (
-        new THREE.MeshBasicMaterial({ color: colorMap[colorIndex] })
-      ));
+      const materials = createCubeMaterials(cubeDef);
       const cube = new THREE.Mesh(geometry, materials);
       cube.position.set(
         x * (cubeSize + gap),
