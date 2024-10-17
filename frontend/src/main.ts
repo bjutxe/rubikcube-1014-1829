@@ -22,9 +22,11 @@ document.body.appendChild(renderer.domElement);
 
 // オービットコントロールの追加
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.25;
-controls.enableZoom = true;
+Object.assign(controls, {
+  enableDamping: true,
+  dampingFactor: 0.25,
+  enableZoom: true
+});
 
 // リサイズ対応
 window.addEventListener('resize', () => {
@@ -45,7 +47,7 @@ const cubeSize = 1;
 const gap = 0.15;
 const rubiksCube = new THREE.Group();
 
-const colorMap = [
+const colorMap: string[] = [
   'black',  // 内側
   'green',  // 後面
   'yellow', // 左面
@@ -55,7 +57,7 @@ const colorMap = [
   'orange'  // 下面
 ];
 
-const initParts = [
+const initParts: number[][][] = [
   [
     [0, 2, 3, 0, 0, 1], [0, 0, 3, 0, 0, 1], [4, 0, 3, 0, 0, 1],
     [0, 2, 3, 0, 0, 0], [0, 0, 3, 0, 0, 0], [4, 0, 3, 0, 0, 0],
@@ -74,41 +76,64 @@ const initParts = [
 ];
 
 // ルービックキューブの初期化
-initParts.forEach((layer, yIndex) => {
-  layer.forEach((cubeDef, xzIndex) => {
-    const x = (xzIndex % 3) - 1;
-    const z = Math.floor(xzIndex / 3) - 1;
-    const y = 1 - yIndex;
+const initializeRubiksCube = (initParts: number[][][]) => {
+  initParts.forEach((layer, yIndex) => {
+    layer.forEach((cubeDef, xzIndex) => {
+      const x = (xzIndex % 3) - 1;
+      const z = Math.floor(xzIndex / 3) - 1;
+      const y = 1 - yIndex;
 
-    const geometry = new THREE.BoxGeometry(cubeSize * 0.95, cubeSize * 0.95, cubeSize * 0.95);
-    const materials = [
-      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[0]] }), // 右面
-      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[1]] }), // 左面
-      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[2]] }), // 上面
-      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[3]] }), // 下面
-      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[4]] }), // 前面
-      new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[5]] })  // 後面
-    ];
-    const cube = new THREE.Mesh(geometry, materials);
-    cube.position.set(
-      x * (cubeSize + gap),
-      y * (cubeSize + gap),
-      z * (cubeSize + gap)
-    );
-    rubiksCube.add(cube);
+      const geometry = new THREE.BoxGeometry(
+        cubeSize * 0.95,
+        cubeSize * 0.95,
+        cubeSize * 0.95
+      );
+      const materials = [
+        new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[0]] }), // 右面
+        new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[1]] }), // 左面
+        new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[2]] }), // 上面
+        new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[3]] }), // 下面
+        new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[4]] }), // 前面
+        new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[5]] })  // 後面
+      ];
+      const cube = new THREE.Mesh(geometry, materials);
+      cube.position.set(
+        x * (cubeSize + gap),
+        y * (cubeSize + gap),
+        z * (cubeSize + gap)
+      );
+      rubiksCube.add(cube);
+    });
   });
-});
+};
+
+initializeRubiksCube(initParts);
 
 rubiksCube.position.set(0, 0, 0);
 camera.lookAt(rubiksCube.position);
 scene.add(rubiksCube);
 
+// コントロールの更新
+const updateControls = () => {
+  controls.update();
+};
+
+// TWEENの更新
+const updateTweens = () => {
+  TWEEN.update();
+};
+
+// レンダリング
+const renderScene = () => {
+  renderer.render(scene, camera);
+};
+
 // アニメーションループ
 const animate = () => {
-  controls.update();
   requestAnimationFrame(animate);
-  TWEEN.update();
-  renderer.render(scene, camera);
+  updateControls();
+  updateTweens();
+  renderScene();
 };
 
 animate();
@@ -117,9 +142,7 @@ animate();
 const handleKeyPress = (event: KeyboardEvent) => {
   event.preventDefault();
   const key = event.key.toUpperCase();
-  // 逆回転を示す
   const isAlt = event.altKey;
-  // 2層回転を示す
   const isShift = event.shiftKey;
   const keyMap: Record<string, [string, number, number]> = {
     'U': ['y', 1, -Math.PI / 2],
@@ -137,26 +160,50 @@ const handleKeyPress = (event: KeyboardEvent) => {
   };
 
   if (key in keyMap) {
-    let [axis, direction, angle] = keyMap[key];
-
-    // 逆回転
-    angle *= isAlt ? -1 : 1;
-
-    // 2層回転
-    if (isShift && direction !== 0) {
-      rotateLayer(axis as 'x' | 'y' | 'z', 0, angle);
-    }
-
-    // 通常のレイヤーまたは全体の回転
-    if (['X', 'Y', 'Z'].includes(key)) {
-      rotateCube(axis as 'x' | 'y' | 'z', angle);
-    } else {
-      rotateLayer(axis as 'x' | 'y' | 'z', direction, angle);
-    }
+    handleRotation(key, isAlt, isShift, keyMap);
   }
 };
 
-const rotateGroup = (group: THREE.Group, axis: 'x' | 'y' | 'z', angle: number, onCompleteCallback: () => void) => {
+const handleRotation = (
+  key: string,
+  isAlt: boolean,
+  isShift: boolean,
+  keyMap: Record<string, [string, number, number]>
+) => {
+  let [axis, direction, angle] = keyMap[key];
+
+  // 逆回転
+  angle *= isAlt ? -1 : 1;
+
+  // 2層回転
+  if (isShift && direction !== 0) {
+    rotateLayer(axis as 'x' | 'y' | 'z', 0, angle);
+  }
+
+  // 通常のレイヤーまたは全体の回転
+  if (['X', 'Y', 'Z'].includes(key)) {
+    rotateCube(axis as 'x' | 'y' | 'z', angle);
+  } else {
+    rotateLayer(axis as 'x' | 'y' | 'z', direction, angle);
+  }
+};
+
+const createGroupFromCubes = (cubesToMove: THREE.Object3D[]) => {
+  const group = new THREE.Group();
+  cubesToMove.forEach(cube => {
+    rubiksCube.remove(cube);
+    group.add(cube);
+  });
+  rubiksCube.add(group);
+  return group;
+};
+
+const rotateGroup = (
+  group: THREE.Group,
+  axis: 'x' | 'y' | 'z',
+  angle: number,
+  onCompleteCallback: () => void
+) => {
   new TWEEN.Tween({ rotation: 0 })
     .to({ rotation: angle }, 500)
     .easing(TWEEN.Easing.Quadratic.Out)
@@ -167,13 +214,12 @@ const rotateGroup = (group: THREE.Group, axis: 'x' | 'y' | 'z', angle: number, o
     .start();
 };
 
-const rotateLayerOrCube = (cubesToMove: THREE.Object3D[], axis: 'x' | 'y' | 'z', angle: number) => {
-  const group = new THREE.Group();
-  cubesToMove.forEach(cube => {
-    rubiksCube.remove(cube);
-    group.add(cube);
-  });
-  rubiksCube.add(group);
+const rotateLayerOrCube = (
+  cubesToMove: THREE.Object3D[],
+  axis: 'x' | 'y' | 'z',
+  angle: number
+) => {
+  const group = createGroupFromCubes(cubesToMove);
 
   rotateGroup(group, axis, angle, () => {
     while (group.children.length > 0) {
@@ -190,20 +236,20 @@ const rotateLayerOrCube = (cubesToMove: THREE.Object3D[], axis: 'x' | 'y' | 'z',
   });
 };
 
-const rotateLayer = (axis: 'x' | 'y' | 'z', direction: number, angle: number) => {
-  const cubesToMove: THREE.Object3D[] = [];
-  rubiksCube.children.forEach((cube: THREE.Object3D) => {
-    const pos = cube.position;
-    if (Math.round(pos[axis]) === direction) cubesToMove.push(cube);
+const rotateLayer = (
+  axis: 'x' | 'y' | 'z',
+  direction: number,
+  angle: number
+) => {
+  const cubesToMove = rubiksCube.children.filter((cube: THREE.Object3D) => {
+    return Math.round(cube.position[axis]) === direction;
   });
 
   rotateLayerOrCube(cubesToMove, axis, angle);
 };
 
 const rotateCube = (axis: 'x' | 'y' | 'z', angle: number) => {
-  const cubesToMove: THREE.Object3D[] = [];
-  rubiksCube.children.forEach(cube => cubesToMove.push(cube));
-
+  const cubesToMove = rubiksCube.children.slice();
   rotateLayerOrCube(cubesToMove, axis, angle);
 };
 
