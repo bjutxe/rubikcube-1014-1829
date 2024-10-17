@@ -138,6 +138,11 @@ const updateTweens = () => {
   TWEEN.update();
 };
 
+// リロード時にrotationLogをリセット
+window.addEventListener('beforeunload', () => {
+  rotationLog = "";
+});
+
 // レンダリング
 const renderScene = () => {
   renderer.render(scene, camera);
@@ -154,6 +159,8 @@ const animate = () => {
 animate();
 
 // キーボード入力による回転
+let rotationLog = "";
+
 const handleKeyPress = (event: KeyboardEvent) => {
   event.preventDefault();
   const key = event.key.toUpperCase();
@@ -176,10 +183,26 @@ const handleKeyPress = (event: KeyboardEvent) => {
 
   if (key in keyMap) {
     handleRotation(key, isAlt, isShift, keyMap);
+    logRotation(key, isAlt, isShift);
   }
 };
 
 document.addEventListener('keydown', handleKeyPress);
+
+const logRotation = (key: string, isAlt: boolean, isShift: boolean) => {
+  let rotation = key;
+
+  // 2層回転の場合、小文字の 'w' を追加
+  if (isShift && ['F', 'B', 'R', 'L', 'U', 'D'].includes(key)) {
+    rotation += "w";
+  }
+
+  // 逆回転の場合、プライム記号を追加
+  rotation += isAlt ? "'" : "";
+
+  rotationLog += rotation + " ";
+  console.log("Rotation Log: ", rotationLog.trim());
+};
 
 const handleRotation = (
   key: string,
