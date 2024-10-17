@@ -28,6 +28,19 @@ const createRenderer = () => {
 };
 const renderer = createRenderer();
 
+// 回転の記号表示用の要素を作成
+const rotationDisplay = document.createElement('div');
+rotationDisplay.id = 'rotation-display';
+rotationDisplay.style.position = 'absolute';
+rotationDisplay.style.top = '10px';
+rotationDisplay.style.left = '10px';
+rotationDisplay.style.padding = '10px';
+rotationDisplay.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+rotationDisplay.style.fontFamily = 'monospace';
+rotationDisplay.style.fontSize = '24px';
+rotationDisplay.style.zIndex = '100';
+document.body.appendChild(rotationDisplay);
+
 // オービットコントロールの追加
 const createControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -138,9 +151,9 @@ const updateTweens = () => {
   TWEEN.update();
 };
 
-// リロード時にrotationLogをリセット
+// リロード時にrotationStringをリセット
 window.addEventListener('beforeunload', () => {
-  rotationLog = "";
+  rotationString = "";
 });
 
 // レンダリング
@@ -159,7 +172,7 @@ const animate = () => {
 animate();
 
 // キーボード入力による回転
-let rotationLog = "";
+let rotationString = "";
 
 const handleKeyPress = (event: KeyboardEvent) => {
   event.preventDefault();
@@ -200,8 +213,11 @@ const logRotation = (key: string, isAlt: boolean, isShift: boolean) => {
   // 逆回転の場合、プライム記号を追加
   rotation += isAlt ? "'" : "";
 
-  rotationLog += rotation + " ";
-  console.log("Rotation Log: ", rotationLog.trim());
+  rotationString += rotation + " ";
+  const rotationDisplayElement = document.getElementById('rotation-display');
+  if (rotationDisplayElement) {
+    rotationDisplayElement.innerText = rotationString.trim();
+  }
 };
 
 const handleRotation = (
