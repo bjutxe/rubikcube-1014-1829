@@ -138,15 +138,11 @@ const handleKeyPress = (event: KeyboardEvent) => {
     let [axis, direction, angle] = keyMap[key];
 
     // 逆回転
-    if (isAlt) {
-      angle = -angle;
-    }
+    angle *= isAlt ? -1 : 1;
 
     // 2層回転
-    if (isShift) {
-      if (direction !== 0) {
-        rotateLayer(axis as 'x' | 'y' | 'z', 0, angle); // 中央層も回転
-      }
+    if (isShift && direction !== 0) {
+      rotateLayer(axis as 'x' | 'y' | 'z', 0, angle);
     }
 
     // 通常のレイヤーまたは全体の回転
