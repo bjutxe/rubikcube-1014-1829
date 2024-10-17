@@ -88,14 +88,9 @@ const initializeRubiksCube = (initParts: number[][][]) => {
         cubeSize * 0.95,
         cubeSize * 0.95
       );
-      const materials = [
-        new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[0]] }), // 右面
-        new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[1]] }), // 左面
-        new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[2]] }), // 上面
-        new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[3]] }), // 下面
-        new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[4]] }), // 前面
-        new THREE.MeshBasicMaterial({ color: colorMap[cubeDef[5]] })  // 後面
-      ];
+      const materials = cubeDef.map(colorIndex => (
+        new THREE.MeshBasicMaterial({ color: colorMap[colorIndex] })
+      ));
       const cube = new THREE.Mesh(geometry, materials);
       cube.position.set(
         x * (cubeSize + gap),
