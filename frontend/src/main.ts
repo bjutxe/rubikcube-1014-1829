@@ -115,10 +115,12 @@ animate();
 
 // キーボード入力による回転
 const handleKeyPress = (event: KeyboardEvent) => {
-  event.preventDefault(); // キーボードのデフォルト動作を無効化
+  event.preventDefault();
   const key = event.key.toUpperCase();
-  const isAlt = event.altKey;      // 逆回転を示す
-  const isShift = event.shiftKey;  // 2層回転を示す
+  // 逆回転を示す
+  const isAlt = event.altKey;
+  // 2層回転を示す
+  const isShift = event.shiftKey;
   const keyMap: Record<string, [string, number, number]> = {
     'U': ['y', 1, -Math.PI / 2],
     'D': ['y', -1, Math.PI / 2],
