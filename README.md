@@ -1,5 +1,7 @@
 # Rubik Cube
 
+![localhost](https://github.com/user-attachments/assets/0bbd1407-6403-45e9-9faa-9a12dc06cc25)
+
 This project is a monorepo that includes both a backend and a frontend, utilizing Rust and TypeScript respectively.  
 The frontend displays a Rubik's Cube using Three.js.
 
