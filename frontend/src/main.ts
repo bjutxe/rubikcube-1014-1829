@@ -77,13 +77,13 @@ const gap = 0.15;
 const rubiksCube = new THREE.Group();
 
 const colorMap: string[] = [
-	'black',	// 内側
-	'green',	// 後面
+	'black',  // 内側
+	'green',  // 後面
 	'yellow', // 左面
-	'red',		// 上面
-	'white',	// 右面
-	'blue',	 // 前面
-	'orange'	// 下面
+	'red',    // 上面
+	'white',  // 右面
+	'blue',   // 前面
+	'orange'  // 下面
 ];
 
 const initParts: number[][][] = [
