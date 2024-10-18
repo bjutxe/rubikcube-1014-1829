@@ -259,6 +259,14 @@ const handleKeyPress = (event: KeyboardEvent) => {
 		handleRotation(key, isAlt, isShift, keyMap);
 		logRotation(key, isAlt, isShift);
 	}
+
+	// AltキーとShiftキーの色変更
+	if (isAlt) {
+		altButton.style.backgroundColor = 'lightblue';
+	}
+	if (isShift) {
+		shiftButton.style.backgroundColor = 'lightblue';
+	}
 };
 
 document.addEventListener('keydown', handleKeyPress);
@@ -266,6 +274,14 @@ document.addEventListener('keyup', (event: KeyboardEvent) => {
 	const key = event.key.toUpperCase();
 	if (keyButtons[key]) {
 		keyButtons[key].style.backgroundColor = '';
+	}
+
+	// AltキーとShiftキーの色リセット
+	if (event.key === 'Alt') {
+		altButton.style.backgroundColor = '';
+	}
+	if (event.key === 'Shift') {
+		shiftButton.style.backgroundColor = '';
 	}
 });
 
