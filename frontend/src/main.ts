@@ -41,6 +41,64 @@ rotationDisplay.style.fontSize = '24px';
 rotationDisplay.style.zIndex = '100';
 document.body.appendChild(rotationDisplay);
 
+// 仮想キーボードの作成
+const virtualKeyboard = document.createElement('div');
+virtualKeyboard.id = 'virtual-keyboard';
+virtualKeyboard.style.position = 'absolute';
+virtualKeyboard.style.bottom = '10px';
+virtualKeyboard.style.left = '10px';
+virtualKeyboard.style.padding = '10px';
+virtualKeyboard.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+virtualKeyboard.style.fontFamily = 'monospace';
+virtualKeyboard.style.fontSize = '24px';
+virtualKeyboard.style.zIndex = '100';
+virtualKeyboard.style.display = 'grid';
+virtualKeyboard.style.gridTemplateColumns = 'repeat(6, 50px)';
+virtualKeyboard.style.gridGap = '10px';
+document.body.appendChild(virtualKeyboard);
+
+const keys = ['F', 'B', 'R', 'L', 'U', 'D', 'X', 'Y', 'Z', 'M', 'E', 'S'];
+const keyButtons: Record<string, HTMLButtonElement> = {};
+
+keys.forEach(key => {
+	const button = document.createElement('button');
+	button.innerText = key;
+	button.style.width = '50px';
+	button.style.height = '50px';
+	button.style.fontSize = '24px';
+	button.addEventListener('click', () => {
+		handleKeyPress({ key, altKey: altButtonPressed, shiftKey: shiftButtonPressed } as KeyboardEvent);
+	});
+	virtualKeyboard.appendChild(button);
+	keyButtons[key] = button;
+});
+
+// AltキーとShiftキーのボタン追加
+const altButton = document.createElement('button');
+altButton.innerText = 'Alt';
+altButton.style.width = '50px';
+altButton.style.height = '50px';
+altButton.style.fontSize = '24px';
+altButton.addEventListener('click', () => {
+	altButtonPressed = !altButtonPressed;
+	altButton.style.backgroundColor = altButtonPressed ? 'lightblue' : '';
+});
+virtualKeyboard.appendChild(altButton);
+
+const shiftButton = document.createElement('button');
+shiftButton.innerText = 'Shift';
+shiftButton.style.width = '50px';
+shiftButton.style.height = '50px';
+shiftButton.style.fontSize = '24px';
+shiftButton.addEventListener('click', () => {
+	shiftButtonPressed = !shiftButtonPressed;
+	shiftButton.style.backgroundColor = shiftButtonPressed ? 'lightblue' : '';
+});
+virtualKeyboard.appendChild(shiftButton);
+
+let altButtonPressed = false;
+let shiftButtonPressed = false;
+
 // オービットコントロールの追加
 const createControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
 	const controls = new OrbitControls(camera, renderer.domElement);
@@ -195,12 +253,21 @@ const handleKeyPress = (event: KeyboardEvent) => {
 	};
 
 	if (key in keyMap) {
+		if (keyButtons[key]) {
+			keyButtons[key].style.backgroundColor = 'lightblue';
+		}
 		handleRotation(key, isAlt, isShift, keyMap);
 		logRotation(key, isAlt, isShift);
 	}
 };
 
 document.addEventListener('keydown', handleKeyPress);
+document.addEventListener('keyup', (event: KeyboardEvent) => {
+	const key = event.key.toUpperCase();
+	if (keyButtons[key]) {
+		keyButtons[key].style.backgroundColor = '';
+	}
+});
 
 const logRotation = (key: string, isAlt: boolean, isShift: boolean) => {
 	let rotation = key;
