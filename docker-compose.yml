@@ -2,14 +2,27 @@ services:
   backend:
     build:
       context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    volumes:
+      - ./backend:/usr/src/app
     networks:
       - app-network
+
+  experiment:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: ["./experiment"]
+    networks:
+      - app-network
+    restart: "no"
 
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     volumes:
