@@ -4,20 +4,23 @@ use pyo3::types::PyModule;
 fn main() -> PyResult<()> {
     // Python GIL (Global Interpreter Lock) を取得し、PythonのコードをRustから実行します。
     Python::with_gil(|py| {
-        // SymPyモジュールをインポート
-        let sympy = PyModule::import(py, "sympy")?;
+        // SymPyのcombinatoricsモジュールをインポート
+        let sympy_combinatorics = PyModule::import(py, "sympy.combinatorics")?;
+        let permutation = sympy_combinatorics.getattr("Permutation")?;
+        let symmetric_group = sympy_combinatorics.getattr("SymmetricGroup")?;
 
-        // SymPyでSymbolオブジェクトを生成
-        let symbol = sympy.getattr("Symbol")?;
-        let x = symbol.call1(("x",))?;
-        let y = symbol.call1(("y",))?;
+        // 置換 (0, 1, 2) を生成
+        let p = permutation.call1((vec![1, 2, 0],))?;
+        println!("Permutation: {}", p);
 
-        // 数式 x + 2 * y を生成
-        let two = py.eval("2", None, None)?;
-        let y_mul_two = y.call_method1("__mul__", (two,))?;
-        let expr = x.call_method1("__add__", (y_mul_two,))?;
+        // 3次対称群を生成
+        let s3 = symmetric_group.call1((3,))?;
+        println!("Symmetric Group S3: {}", s3);
 
-        println!("21:00 Result: {}", expr);
+        // 生成された群の位数を取得
+        let order = s3.getattr("order")?.call0()?;
+        println!("Order of S3: {}", order);
+
         Ok(())
     })
 }
