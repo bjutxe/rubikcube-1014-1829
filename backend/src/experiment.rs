@@ -1,25 +1,23 @@
 use pyo3::prelude::*;
-use pyo3::types::IntoPyDict;
+use pyo3::types::PyModule;
 
 fn main() -> PyResult<()> {
     // Python GIL (Global Interpreter Lock) を取得し、PythonのコードをRustから実行します。
     Python::with_gil(|py| {
         // SymPyモジュールをインポート
-        let sympy = py.import("sympy")?;
-        let locals = [("sympy", sympy)].into_py_dict(py);
+        let sympy = PyModule::import(py, "sympy")?;
 
-        // SymPyを使った数式の作成と評価
-        let expr = py.eval("sympy.Symbol('x') + 2 * sympy.Symbol('y')", Some(locals), None)?;
-        println!("Result: {}", expr);
+        // SymPyでSymbolオブジェクトを生成
+        let symbol = sympy.getattr("Symbol")?;
+        let x = symbol.call1(("x",))?;
+        let y = symbol.call1(("y",))?;
+
+        // 数式 x + 2 * y を生成
+        let two = py.eval("2", None, None)?;
+        let y_mul_two = y.call_method1("__mul__", (two,))?;
+        let expr = x.call_method1("__add__", (y_mul_two,))?;
+
+        println!("21:00 Result: {}", expr);
         Ok(())
     })
 }
-
-/*
-このコードでは、RustとPythonの間でPyO3を使用してSymPyを呼び出しています。
-1. `Python::with_gil` でPythonのGIL（Global Interpreter Lock）を取得し、Pythonのコードを安全に実行します。
-2. `py.import("sympy")` でSymPyモジュールをインポートし、`locals` 変数に追加します。
-3. `py.eval` を使ってPythonコード内でSymPyの式を評価し、その結果をRustで表示します。
-
-この方法を使うことで、Rustのプロジェクト内でSymPyの強力な数式処理能力を利用することができます。
-*/

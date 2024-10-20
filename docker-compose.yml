@@ -14,10 +14,11 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    command: ["./experiment"]
+    command: ["cargo-watch", "-x", "run --bin experiment"]
+    volumes:
+      - ./backend:/usr/src/app
     networks:
       - app-network
-    restart: "no"
 
   frontend:
     build:
